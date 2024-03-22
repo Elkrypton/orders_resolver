@@ -100,7 +100,7 @@ class InitiateReturnCase:
 def initiate_return_case(request, order_number):
 	retail_name = Retail.objects.all()
 	vendor_name = Vendor.objects.all()
-	order = Order.objects.get(order_number=order_number)
+	order = Order.objects.get(order_number=str(order_number))
 	if order.delivery_status == '0004':
 	    return_case = InitiateReturnCase(retail_name, vendor_name)
 	    result = return_case.check_all_conditions()

@@ -46,12 +46,18 @@ PURCHASE_LOCATION = [('store', 'store'),
 class Product(models.Model):
 	product = models.CharField(max_length=100)
 	returnable = models.BooleanField(default=False)
+	
+	def __str__(self):
+		return f"Product : {self.product}"
 
 
 class Issue(models.Model):
 	issue_id = models.CharField(max_length=255, null=True, blank=True)
 	issue_initiated = models.BooleanField(default=False)
 	issue_status = models.CharField(choices=ISSUE_STATUS, max_length=100)
+
+	def __str__(self):
+		return f"Issue : {self.issue_status}"
 
 
 class Retail(models.Model):
@@ -60,23 +66,32 @@ class Retail(models.Model):
 	return_to_warehouse_window = models.IntegerField(default=48, editable=False)
 	return_to_store_window = models.IntegerField(default=2160, editable=False)
 
+	def __str__(self):
+		return f"Retail Name : {self.retail_name}"
+
 class Vendor(models.Model):
 	vendor_name = models.CharField(max_length=100)
 	accept_return = models.BooleanField(default=False)
 	return_window = models.CharField(default=720, editable=False, max_length=100)
-	vendor_error = models.CharField(default=False, max_length=100)
+
+
+	def __str__(self):
+		return f"Vendor Name : {self.vendor_name}"
 	
 class Customer(models.Model):
 	customer_name = models.CharField(max_length=100)
 	payment_method = models.CharField(choices=PAYMENT_METHODS, max_length=100)
 
+	def __str__(self):
+		return f"Customer Name : {self.customer_name}"
+
 
 class Order(models.Model):
 	order_number = models.CharField(max_length=255)
-	product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
-	retail = models.ForeignKey(Retail, on_delete=models.SET_NULL, null=True, blank=True)
-	vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, blank=True, null=True)
-	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, blank=True, null=True)
+	product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
+	retail = models.ForeignKey('Retail', on_delete=models.CASCADE, null=True, blank=True)
+	vendor = models.ForeignKey('Vendor', on_delete=models.CASCADE, blank=True, null=True)
+	customer = models.ForeignKey('Customer', on_delete=models.CASCADE, blank=True, null=True)
 	order_location = models.CharField(choices=PURCHASE_LOCATION, max_length=100)
 	delivery_status = models.CharField(max_length=233, choices=DELIVERY_STATUS)
 	damage = models.CharField(max_length=255, choices=DAMAGE_SOURCE)
@@ -91,6 +106,10 @@ class Order(models.Model):
 	def save(self, *args, **kwargs):
 		if not self.order_number:
 			self.order_number = self.generate_order_number()
+
+	
+	def __str__(self):
+		return f"Order Number : {self.order_number}"
 	
 
 

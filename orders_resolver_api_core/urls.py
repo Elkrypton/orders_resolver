@@ -26,7 +26,7 @@ urlpatterns = [
         path('vendor/', VendorListCreateAPIView.as_view(), name='vendor-list-create'),
         path('retail/', RetailListCreateAPIView.as_view(), name='retail-list-create'),
         path('order-details/<int:pk>/', OrderDetailAPIView.as_view(), name='order-detail-create'),
-        path('issue/initiate_return/',initiate_return_case, name="initiate-return-case"),
+        path('issue/initiate_return/<str:order_number>/',initiate_return_case, name="initiate-return-case"),
         # path('delivery/', DeliveryAPIView.as_view(), name='delivery_status'),
         # path('damage/', DamageAPIView.as_view(), name='damage'),
 
