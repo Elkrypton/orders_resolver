@@ -12,6 +12,7 @@ DAMAGE_SOURCE = [
 	('CUSTOMER_DAMAGE', 'customer damage'),
 	('VENDOR_DAMAGE', 'vendor damage'),
 	('RETAIL_DAMAGE',  'retail damage'),
+	('NONE',  None),
 ]
 
 ISSUE_TYPES = [
@@ -87,6 +88,7 @@ class Customer(models.Model):
 
 
 class Order(models.Model):
+	id = models.AutoField(primary_key=True)
 	order_number = models.CharField(max_length=255)
 	product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
 	retail = models.ForeignKey('Retail', on_delete=models.CASCADE, null=True, blank=True)
@@ -94,8 +96,7 @@ class Order(models.Model):
 	customer = models.ForeignKey('Customer', on_delete=models.CASCADE, blank=True, null=True)
 	order_location = models.CharField(choices=PURCHASE_LOCATION, max_length=100)
 	delivery_status = models.CharField(max_length=233, choices=DELIVERY_STATUS)
-	damage = models.CharField(max_length=255, choices=DAMAGE_SOURCE)
-
+	damage = models.CharField(max_length=255, choices=DAMAGE_SOURCE, default=None)
 
 	def generate_order_number(self):
 		prefix = "IR"
@@ -106,10 +107,11 @@ class Order(models.Model):
 	def save(self, *args, **kwargs):
 		if not self.order_number:
 			self.order_number = self.generate_order_number()
+		
+		if self.delivery_status != 'DELIVERED':
+			self.damage = None
 
-	
 	def __str__(self):
 		return f"Order Number : {self.order_number}"
 	
-
 
