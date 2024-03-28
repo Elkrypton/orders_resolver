@@ -88,8 +88,8 @@ class Customer(models.Model):
 
 
 class Order(models.Model):
-	id = models.AutoField(primary_key=True)
-	order_number = models.CharField(max_length=255)
+
+	order_number = models.IntegerField(primary_key=True)
 	product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
 	retail = models.ForeignKey('Retail', on_delete=models.CASCADE, null=True, blank=True)
 	vendor = models.ForeignKey('Vendor', on_delete=models.CASCADE, blank=True, null=True)
@@ -98,16 +98,14 @@ class Order(models.Model):
 	delivery_status = models.CharField(max_length=233, choices=DELIVERY_STATUS)
 	damage = models.CharField(max_length=255, choices=DAMAGE_SOURCE, default=None)
 
-	def generate_order_number(self):
-		prefix = "IR"
-		random_part = str(uuid.uuid4().int)[:5]
-		sequential_part = str(uuid.uuid4().int)[:5]
-		return f"{prefix}-{random_part}-{sequential_part}"
+	# def generate_order_number(self):
+	# 	prefix = "IR"
+	# 	random_part = str(uuid.uuid4().int)[:5]
+	# 	sequential_part = str(uuid.uuid4().int)[:5]
+	# 	return f"{prefix}-{random_part}-{sequential_part}"
 	
 	def save(self, *args, **kwargs):
-		if not self.order_number:
-			self.order_number = self.generate_order_number()
-		
+
 		if self.delivery_status != 'DELIVERED':
 			self.damage = None
 

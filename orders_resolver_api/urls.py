@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('orders_resolver/', include('orders_resolver_api_core.urls')), 
+    path('', include('orders_resolver_api_core.urls')), 
 
     path('admin/', admin.site.urls),
     path('api-auth/',include('rest_framework.urls')),
