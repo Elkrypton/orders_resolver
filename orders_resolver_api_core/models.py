@@ -8,6 +8,19 @@ import uuid
 from time import time
 
 
+product_materials = [
+	('PLASTIC','plastic'),
+	('METAL','material'),
+	('GLASS', 'glass'),
+]
+
+product_categories = [('HOME DECOR', 'Home Decor'),
+		      ('APPLIANCES', 'Appliances'),
+			  ('ELECTRONICS', 'Electronics'),
+			  ('ACCESSORIES', 'Accessories'),]
+
+
+
 DAMAGE_SOURCE = [
 	('CUSTOMER_DAMAGE', 'customer damage'),
 	('VENDOR_DAMAGE', 'vendor damage'),
@@ -47,9 +60,14 @@ PURCHASE_LOCATION = [('store', 'store'),
 class Product(models.Model):
 	product = models.CharField(max_length=100)
 	returnable = models.BooleanField(default=False)
+	product_materials = models.CharField(max_length=255, choices=product_materials)
+	product_categories = models.CharField(max_length=255, choices=product_categories)
+
 	
 	def __str__(self):
 		return f"Product : {self.product}"
+
+
 
 
 class Issue(models.Model):
@@ -89,7 +107,7 @@ class Customer(models.Model):
 
 class Order(models.Model):
 
-	order_number = models.IntegerField(primary_key=True)
+	order_number = models.IntegerField()
 	product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
 	retail = models.ForeignKey('Retail', on_delete=models.CASCADE, null=True, blank=True)
 	vendor = models.ForeignKey('Vendor', on_delete=models.CASCADE, blank=True, null=True)
