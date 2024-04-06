@@ -11,7 +11,7 @@ import uuid
 
 class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 	serializer_class = OrderSerializer
-	lookup_field = 'pk'
+	lookup_field = 'order_number'
 	def get_queryset(self):
 		return Order.objects.all()
 
@@ -36,6 +36,7 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
 
 class IssueListCreateAPIView(generics.ListCreateAPIView):
 	queryset = Issue.objects.all()
+	lookup_field = "order_number"
 	serializer_class = IssueSerializer
 
 class VendorListCreateAPIView(generics.ListCreateAPIView):
@@ -61,24 +62,20 @@ def generate_random_issue_id():
 
 class InitiateReturnCase:
 
-    def __init__(self, delivery_status ,retail_name=None, vendor_name=None):
-        self.retail_name = retail_name
-        self.vendor_name = vendor_name
-        self.delivery_status = delivery_status
+    def __init__(self, order):
+        self.order = order
+        self.retail = order.retail
+        self.vendor = order.vendor
+        self.delivery_status = order.delivery_status
+        self.product = order.product
 
     def check_all_conditions(self):
-        try:
-            order = Order.objects.all()
-            retail = Retail.objects.get(retail_name=self.retail_name)
-            vendor = Vendor.objects.get(vendor_name=self.vendor_name)
-            products = Product.objects.filter(returnable=True)
 	    
-
-            for product in products:
-                if (retail.accept_return and vendor.accept_return and
-                        ((retail.return_to_warehouse_window == 48 and order.damage == 'vendor_damage') or
-                         (vendor.return_window == 720 and vendor.vendor_error) or
-                         (retail.return_to_store_window == 720 and vendor.vendor_error))):
+        if self.product.returnable:
+                if (self.retail.accept_return and self.vendor.accept_return and
+                        ((self.retail.return_to_warehouse_window == 48 and self.order.damage == '1002') or
+                         (self.vendor.return_window == 720 and self.order.damage=="1002") or
+                         (self.retail.return_to_store_window == 720 and self.order.damage== "1003"))):
                     issue = Issue.objects.create(
                         issue_id=generate_random_issue_id(),
                         issue_initiated=True,
@@ -93,17 +90,16 @@ class InitiateReturnCase:
                     )
                     issue.save()
 
-            return str(issue)
-        except (Retail.DoesNotExist, Vendor.DoesNotExist) as e:
-            return f"Retail or Vendor not found: {e}"
+        return str(issue)
 	
 def initiate_return_case(request, order_number):
-	retail_name = Retail.objects.all()
-	vendor_name = Vendor.objects.all()
-	order = Order.objects.get(order_number=str(order_number))
-	if order.delivery_status == '0004':
-	    return_case = InitiateReturnCase(retail_name, vendor_name)
+	
+	order = Order.objects.get(order_number=order_number)
+	print(order)
+	if order.delivery_status == 'DELIVERED':
+	    return_case = InitiateReturnCase(order)
 	    result = return_case.check_all_conditions()
 	    return JsonResponse({'result': result})
+
 	else:
 		return JsonResponse({'result': "return Case cannot be initiated when unit has not been delivererd yet."})
