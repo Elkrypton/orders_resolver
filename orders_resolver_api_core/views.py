@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
 from .models import (
-Order, Product, Issue, Vendor, Retail, Customer)
+Order, Product, Issue, Vendor, Retail, Customer, Delivery, Link)
 from .serializers import *
 from django.http import JsonResponse
 from rest_framework import viewsets
@@ -16,13 +16,17 @@ class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 		return Order.objects.all()
 
 
+class RelationshipAPIView(generics.ListCreateAPIView):
+	queryset = Link.objects.all()
+	serializer_class = RelationshipSerializer
+
 # class DamageAPIView(generics.ListCreateAPIView):
 # 	queryset = Damage.objects.all()
 # 	serializer_class = DamageSerializer
 	
-# class DeliveryAPIView(generics.ListCreateAPIView):
-# 	queryset = Delivery.objects.all()
-# 	serializer_class = DeliverySerializer
+class DeliveryAPIView(generics.ListCreateAPIView):
+	queryset = Delivery.objects.all()
+	serializer_class = DeliverySerializer
 
 class OrderListCreateAPIView(generics.ListCreateAPIView):
 	queryset = Order.objects.all()
@@ -67,34 +71,20 @@ class InitiateReturnCase:
         self.retail = order.retail
         self.vendor = order.vendor
         self.delivery_status = order.delivery_status
-        self.product = order.product
+        self.product = order.product.retunable
 
     def check_all_conditions(self):
-	    
-        if self.product.returnable:
-                if (self.retail.accept_return and self.vendor.accept_return and
-                        ((self.retail.return_to_warehouse_window == 48 and self.order.damage == '1002') or
-                         (self.vendor.return_window == 720 and self.order.damage=="1002") or
-                         (self.retail.return_to_store_window == 720 and self.order.damage== "1003"))):
-                    issue = Issue.objects.create(
-                        issue_id=generate_random_issue_id(),
-                        issue_initiated=True,
-                        issue_status='passed'
-                    )
-                    issue.save()
-                else:
-                    issue = Issue.objects.create(
-                        issue_id=generate_random_issue_id(),
-                        issue_initiated=True,
-                        issue_status='failed'
-                    )
-                    issue.save()
+	    if not self.product:
+		    return "Failed: Product is not returnable"
+	    if not (self.retail.accept_return and self.vendor_accept_return):
+	    	return "Failed: Retail and/or does not accept return"
 
-        return str(issue)
-	
+
+
+
 def initiate_return_case(request, order_number):
 	
-	order = Order.objects.get(order_number=order_number)
+	order = get_object_or_404(Order, order_number=order_number)
 	print(order)
 	if order.delivery_status == 'DELIVERED':
 	    return_case = InitiateReturnCase(order)

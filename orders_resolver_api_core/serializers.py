@@ -7,7 +7,8 @@ from .models import (
     Vendor,
     Retail,
     # Damage,
-    # Delivery,
+     Delivery, 
+    Link
 )
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -15,6 +16,11 @@ class OrderSerializer(serializers.ModelSerializer):
 		model = Order
 		fields = "__all__"
 
+class RelationshipSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Link
+		fields = "__all__"
+	
 
 class ProductSerializer(serializers.ModelSerializer):
 	class Meta:
@@ -46,8 +52,8 @@ class RetailSerializer(serializers.ModelSerializer):
 # 		model = Damage
 # 		fields = "__all__"
 
-# class DeliverySerializer(serializers.ModelSerializer):
-# 	class Meta:
-# 		model = Delivery
-# 		fields = "__all__"
+class DeliverySerializer(serializers.ModelSerializer):
+	class Meta:
+		model = Delivery
+		fields = "__all__"
 	

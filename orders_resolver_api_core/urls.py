@@ -13,9 +13,9 @@ from .views import (
     InitiateReturnCase,
     initiate_return_case,
     # DamageAPIView,
-    # DeliveryAPIView
+    DeliveryAPIView,
+    RelationshipAPIView,
 )
-
 
 urlpatterns = [
     	path('', OrderListCreateAPIView.as_view(), name='order-list-create'),
@@ -24,6 +24,8 @@ urlpatterns = [
         path('issue/', IssueListCreateAPIView.as_view(), name='issue-list-create'),
         path('customer/', CustomerListCreateAPIView.as_view(), name='customer-list-create'),
         path('vendor/', VendorListCreateAPIView.as_view(), name='vendor-list-create'),
+        path('delivery/', DeliveryAPIView.as_view(), name='delivery-list-create'),
+        path('relationship/', RelationshipAPIView.as_view(), name='relation-list-create'),
         path('retail/', RetailListCreateAPIView.as_view(), name='retail-list-create'),
         path('order-details/<order_number>/', OrderDetailAPIView.as_view(), name='order-detail-create'),
         path('issue/initiate_return/<order_number>/',initiate_return_case, name="initiate-return-case"),
@@ -31,4 +33,3 @@ urlpatterns = [
         # path('damage/', DamageAPIView.as_view(), name='damage'),
 
 	]
-
