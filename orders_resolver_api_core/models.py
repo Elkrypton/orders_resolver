@@ -90,6 +90,8 @@ class Product(models.Model):
 	product_id = models.CharField(max_length=255, unique=True, primary_key=True, editable=False)
 	ordered = models.BooleanField(default=False, blank=True, null=True)
 	product = models.CharField(max_length=100)
+	model_n = models.CharField(max_length=100, blank=True, null=True)
+	serial_n = models.CharField(max_length=100, blank=True, null=True, unique=True)
 	returnable = models.BooleanField(default=False)
 	product_materials = models.CharField(max_length=255, choices=product_materials)
 	product_categories = models.CharField(max_length=255, choices=product_categories)
@@ -116,6 +118,8 @@ class Issue(models.Model):
 	issue_initiated = models.BooleanField(default=False)
 	issue_status = models.CharField(choices=ISSUE_STATUS, max_length=100)
 	order_issued = models.ForeignKey('Order', on_delete=models.CASCADE)
+	link = models.ForeignKey('Link', on_delete=models.CASCADE, null=True)
+	
 
 	def generate_issue_id(self):
 		prefix = "ISS"
@@ -246,7 +250,7 @@ class Order(models.Model):
 			)
 			self.link = link
 
-		if not self.order_number:
+		if not self.order_number and self.delivery_status == 'DELIVERED':
 			self.order_number = self.generate_order_number()
 
 		if self.delivery_status != 'DELIVERED':
