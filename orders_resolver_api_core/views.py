@@ -14,6 +14,13 @@ class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 	lookup_field = 'order_number'
 	def get_queryset(self):
 		return Order.objects.all()
+	
+
+class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
+	serializer_class = ProductSerializer
+	lookup_field = 'product_id'
+	def get_queryset(self):
+		return Product.objects.all()
 
 
 class RelationshipAPIView(generics.ListCreateAPIView):
@@ -55,6 +62,10 @@ class RetailListCreateAPIView(generics.ListCreateAPIView):
 class CustomerListCreateAPIView(generics.ListCreateAPIView):
 	queryset = Customer.objects.all()
 	serializer_class = CustomerSerializer
+
+# class OrderListAPI(generics.ListAPIView):
+# 	queryset = Order.objects.all()
+# 	serializer_class = OrderSerializer
 
 
 def generate_random_issue_id():

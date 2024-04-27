@@ -88,14 +88,17 @@ class Link(models.Model):
 
 class Product(models.Model):
 	product_id = models.CharField(max_length=255, unique=True, primary_key=True, editable=False)
-	ordered = models.BooleanField(default=False, blank=True, null=True)
 	product = models.CharField(max_length=100)
 	model_n = models.CharField(max_length=100, blank=True, null=True)
 	serial_n = models.CharField(max_length=100, blank=True, null=True, unique=True)
 	returnable = models.BooleanField(default=False)
 	product_materials = models.CharField(max_length=255, choices=product_materials)
 	product_categories = models.CharField(max_length=255, choices=product_categories)
-	product_are_of_use = models.CharField(max_length=255, choices=area_of_use)
+	product_area_of_use = models.CharField(max_length=255, choices=area_of_use)
+	vendor = models.ForeignKey('Vendor', on_delete=models.CASCADE)
+	active_warranty = models.BooleanField(default=True)
+	owned_before = models.BooleanField(default=False)
+	
 
 	def generate_product_id(self):
 		prefix = "PROD"
@@ -107,6 +110,9 @@ class Product(models.Model):
 	def save(self, *args, **kwargs):
 		if not self.product_id:
 			self.product_id = self.generate_product_id()
+		
+		if self.owned_before:
+			self.active_warranty = False
 		
 		super(Product, self).save(*args, **kwargs)
 
@@ -225,7 +231,7 @@ class Delivery(models.Model):
 class Order(models.Model):
 
 	order_number = models.CharField(max_length=255, unique=True, editable=False, primary_key=True)
-	product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
+	product = models.ForeignKey('Product',on_delete=models.CASCADE, null=True, blank=True)
 	retail = models.ForeignKey('Retail', on_delete=models.CASCADE, null=True, blank=True)
 	vendor = models.ForeignKey('Vendor', on_delete=models.CASCADE, blank=True, null=True)
 	customer = models.ForeignKey('Customer', on_delete=models.CASCADE, blank=True, null=True)
@@ -233,6 +239,8 @@ class Order(models.Model):
 	damage = models.CharField(max_length=255, choices=DAMAGE_SOURCE, default=False, null=True)
 	delivery_status = models.CharField(max_length=255, choices=DELIVERY_STATUS)
 	link = models.ForeignKey('Link', on_delete=models.CASCADE, null=True)
+	date_delivered = models.DateTimeField((""), auto_now=False, auto_now_add=False)
+	
 
 	def generate_order_number(self):
 		prefix = "IR"
@@ -255,6 +263,10 @@ class Order(models.Model):
 
 		if self.delivery_status != 'DELIVERED':
 			self.damage = None
+		
+		if self.delivery_status == 'DELIVERED':
+			self.date_delivered = str(datetime.datetime.today())
+
 		super(Order, self).save(*args, **kwargs)
 
 	def __str__(self):
