@@ -213,9 +213,18 @@ class Customer(models.Model):
 		return f"Customer ID : {self.customer_id}"
 
 class Delivery(models.Model):
+	delivery_id = models.CharField(max_length=255, primary_key=True, unique=True)
 	related_order = models.ForeignKey('Order', on_delete=models.CASCADE, null=True)
 	delivery_status = models.CharField(max_length=233, choices=DELIVERY_STATUS)
 	date_delivered = models.DateTimeField(auto_now_add=False)
+	issue = models.ForeignKey('Issue', on_delete=models.CASCADE, null=True)
+
+
+	def generate_delivery_id(self):
+		prefix = "DEL"
+		random_part = str(uuid.uuid4().int)[:10]
+		sequential_part = str(uuid.uuid4().int)[:7]
+		return f"{prefix}-{random_part}-{sequential_part}"
 	
 	def save(self, *args, **kwargs):
 
@@ -258,10 +267,10 @@ class Order(models.Model):
 			)
 			self.link = link
 
-		if not self.order_number and self.delivery_status == 'DELIVERED':
+		if not self.order_number and self.delivery_status == 'Delivered':
 			self.order_number = self.generate_order_number()
 
-		if self.delivery_status != 'DELIVERED':
+		if self.delivery_status != 'Delivered':
 			self.damage = None
 		
 		if self.delivery_status == 'DELIVERED':
