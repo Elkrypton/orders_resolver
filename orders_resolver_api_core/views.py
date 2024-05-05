@@ -19,7 +19,7 @@ redis_instance = redis.StrictRedis(host="127.0.0.1", port=637, db=1)
 
 
 class CachedAPIViewMixin:
-	cache_timeout = 60*60
+	cache_timeout = 40*40
 
 	def cached_response(self, cache_key, queryset,  serializer_class):
 		if cache_key in cache:
