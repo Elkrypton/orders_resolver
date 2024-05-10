@@ -64,7 +64,20 @@ from .constants import *
 # 		      	('online', 'online'),
 # 				('VENDOR','Vendor Direct')]
 
+
+# This Python class defines a Link model representing transactions between a Retail entity, a Vendor
+# entity, and a Customer entity, with a method to generate a unique transaction ID.
 class Link(models.Model):
+
+	"""
+	Link Model to represent transaction between Retail, Vendor and Customer
+	Attributes:
+
+	relation_A = Foreignkey to Retail Instance
+	relatoion_B = Foreignkey to Vendor Instance
+	customer = Foreignkey to Customer Instance
+
+	"""
 	link_id = models.CharField(max_length=255, unique=True, editable=False, primary_key=True)
 	relation_A = models.ForeignKey('Retail', on_delete=models.CASCADE)
 	relation_B = models.ForeignKey('Vendor', on_delete=models.CASCADE)
@@ -86,7 +99,11 @@ class Link(models.Model):
 		return f"{self.link_id}: {self.relation_A} AND {self.relation_B}"
 	
 
+# The `Product` class in the Python code defines a model with various fields for product information
+# and includes methods for generating a unique product ID and handling warranty status.
 class Product(models.Model):
+
+
 	product_id = models.CharField(max_length=255, unique=True, primary_key=True, editable=False)
 	product = models.CharField(max_length=100)
 	model_n = models.CharField(max_length=100, blank=True, null=True)
@@ -143,6 +160,14 @@ class Issue(models.Model):
 
 
 class Retail(models.Model):
+
+	"""Retail model 
+
+	Returns:
+		__str__() ->: Retail instance primary key: 
+	"""
+
+
 	retail_id = models.CharField(max_length=255, unique=True, editable=False, primary_key=True)
 	retail_name = models.CharField(max_length=100, unique='True')
 	accept_return = models.BooleanField(default=False)
@@ -213,6 +238,16 @@ class Customer(models.Model):
 		return f"Customer ID : {self.customer_id}"
 
 class Delivery(models.Model):
+
+	"""
+	Delivery Class Model 
+	Attributes:
+		related_order : 90Foreign key(Order number)
+		delivery_status : Tuples of Choices
+		date_delivered: Manually added (auto added as well()
+		issue: Foreign Key for related issue instances
+	"""
+
 	delivery_id = models.CharField(max_length=255, primary_key=True, unique=True)
 	related_order = models.ForeignKey('Order', on_delete=models.CASCADE, null=True)
 	delivery_status = models.CharField(max_length=233, choices=DELIVERY_STATUS)
@@ -234,6 +269,9 @@ class Delivery(models.Model):
 	
 	def __str__(self):
 		return f"{self.delivery_status}"
+	
+	def __doc__(self):
+		return Delivery.__doc__()
 		
 
 
@@ -249,6 +287,7 @@ class Order(models.Model):
 	delivery_status = models.CharField(max_length=255, choices=DELIVERY_STATUS)
 	link = models.ForeignKey('Link', on_delete=models.CASCADE, null=True)
 	date_delivered = models.DateTimeField((""), auto_now=False, auto_now_add=False)
+	ordered = models.BooleanField(default=False)
 	
 
 	def generate_order_number(self):
@@ -267,7 +306,7 @@ class Order(models.Model):
 			)
 			self.link = link
 
-		if not self.order_number and self.delivery_status == 'Delivered':
+		if not self.order_number and self.ordered == True:
 			self.order_number = self.generate_order_number()
 
 		if self.delivery_status != 'Delivered':

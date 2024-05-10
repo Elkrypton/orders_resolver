@@ -4,7 +4,7 @@ import redis
 import time
 from rest_framework.response import Response
 from datetime import timedelta, datetime
-from rest_framework import generics
+from rest_framework import generics, mixins
 from .models import (
 Order, Product, Issue, Vendor, Retail, Customer, Delivery, Link)
 from .serializers import *
@@ -16,7 +16,6 @@ import uuid
 
 
 redis_instance = redis.StrictRedis(host="127.0.0.1", port=637, db=1)
-
 
 class CachedAPIViewMixin:
 	cache_timeout = 40*40
@@ -32,29 +31,6 @@ class CachedAPIViewMixin:
 			cached_data = serializer_instance.data
 			cache.set(cache_key, cached_data, timeout=self.cache_timeout)
 			return Response(cached_data)
-
-
-
-# def initiate_redis_instance(request, queryset, pk, serializer_class):
-# 	variable_key = request.query_params.get(pk)
-	
-# 	if variable_key is not None:
-# 		cache_key = f"{pk}" + variable_key
-# 	else:
-# 		cache_key = pk
-# 	if cache_key in cache:
-# 		print('>> REDIS CACHE.....')
-# 		queryset = cache.get(cache_key)
-# 		return Response(queryset)
-# 	else:
-# 		print(">>>> DB RESPONSE ....")
-# 		if pk is not None:
-# 			queryset = queryset.filter(pk=pk)
-		
-# 		serializer_class = serializer_class(queryset, many=True)
-# 		cache.set(cache_key, serializer_class.data, timeout=60*60)
-# 		return self.cached_response(cache_key, queryset, self.serializer_class)
-
 def log_db_queries(f):
 	from django.db import connection
 	def  new_f(*args, **kwargs):
@@ -76,11 +52,37 @@ def log_db_queries(f):
 
 
 
+class OrderList(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateModelMixin, CachedAPIViewMixin):
+	serializer_class = OrderSerializer
+	queryset = Order.objects.all()
+	
+	@log_db_queries
+	def get(self,request, *args, **kwargs):
+		pk = self.request.query_params.get('order_number')
+		if pk is not None:
+			cache_key = 'order_number' +  pk
+		else:
+			cache_key = 'order_number'
+		
+		queryset = Order.objects.all()
+		if pk:
+			queryset = queryset.filter(pk=pk)
+		return self.cached_response(cache_key, queryset, self.serializer_class)
+	
+	def post(self, request, *args, **kwargs):
+		return self.create(request, *args, **kwargs)
+
+
 class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 	serializer_class = OrderSerializer
 	lookup_field = 'order_number'
 	def get_queryset(self):
 		return Order.objects.all()
+	
+	def get(self, request, *args, **kwargs):
+		pk = self.request.query_params.get('order_number')
+		if pk is not None:
+			cache_key = 
 	
 
 class ProductDetails(generics.RetrieveUpdateDestroyAPIView):

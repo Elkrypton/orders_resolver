@@ -15,12 +15,15 @@ from .views import (
     # DamageAPIView,
     DeliveryAPIView,
     RelationshipAPIView,
-    ProductDetails
+    ProductDetails,
+    OrderList
     # OrderListAPI
 )
 
 urlpatterns = [
     	path('', OrderListCreateAPIView.as_view(), name='order-list-create'),
+        path('order_list/', OrderList.as_view(), name='order-list-create'),
+
 		path('orders/', OrderListCreateAPIView.as_view(), name='order-list-create'),
         path('products/', ProductListCreateAPIView.as_view(), name='product-list-create'),
         path('issue/', IssueListCreateAPIView.as_view(), name='issue-list-create'),
