@@ -2,10 +2,8 @@ from django.db import models
 
 # Create your models here.
 
-from django.db import models
 import uuid
-from time import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from .constants import * 
 
 
@@ -182,6 +180,9 @@ class Retail(models.Model):
 		sequential_part = str(uuid.uuid4().int)[:5]
 		return f"{prefix}-{random_part}-{sequential_part}"
 	
+	def get_info(self):
+		return f"{self.retail_name}: accepts return={self.accept_return} - purchased from={self.purchased_from}"
+	
 	def save(self, *args,**kwargs):
 		if not self.retail_id:
 			self.retail_id = self.generate_retail_id()
@@ -190,7 +191,7 @@ class Retail(models.Model):
 
 
 	def __str__(self):
-		return f"Retail Name : {self.retail_name}"
+		return f"Retail Name {self.retail_name}"
 
 
 class Vendor(models.Model):
@@ -228,6 +229,10 @@ class Customer(models.Model):
 		random_part = str(uuid.uuid4().int)[:5]
 		sequential_part = str(uuid.uuid4().int)[:5]
 		return f"{prefix}-{random_part}-{sequential_part}"
+	
+
+	def get_info(self):
+		return "customer is {} and pays with {}".format(self.customer_name, self.payment_method)
 
 	def save(self, *args, **kwargs):
 		if not self.customer_id:
@@ -270,10 +275,7 @@ class Delivery(models.Model):
 	def __str__(self):
 		return f"{self.delivery_status}"
 	
-	def __doc__(self):
-		return Delivery.__doc__()
-		
-
+	
 
 class Order(models.Model):
 
