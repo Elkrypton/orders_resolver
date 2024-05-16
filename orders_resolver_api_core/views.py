@@ -1,22 +1,15 @@
-from django.shortcuts import render
 from django.core.cache import cache
 import redis
 import time
 from rest_framework.response import Response
 from datetime import timedelta, datetime
 from rest_framework import generics, mixins
-from rest_framework.renderers import JSONRenderer
-from rest_framework.decorators import api_view, renderer_classes, permission_classes
-from rest_framework import permissions
 from .models import (
 Order, Product, Issue, Vendor, Retail, Customer, Delivery, Link)
 from .serializers import *
 from django.http import JsonResponse
-from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
-import uuid
 # Create your views here.
-from utils import post_exec_pipeline
 
 # The line `redis_instance = redis.StrictRedis(host="127.0.0.1", port=637, db=1)` is creating an
 # instance of a Redis client using the `StrictRedis` class from the `redis` library in Python.
