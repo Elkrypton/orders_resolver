@@ -9,12 +9,17 @@ Order, Product, Issue, Vendor, Retail, Customer, Delivery, Link)
 from .serializers import *
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from rest_framework.pagination import PageNumberPagination
 # Create your views here.
 
 # The line `redis_instance = redis.StrictRedis(host="127.0.0.1", port=637, db=1)` is creating an
 # instance of a Redis client using the `StrictRedis` class from the `redis` library in Python.
 redis_instance = redis.StrictRedis(host="127.0.0.1", port=637, db=1)
 
+class CustomPagination(PageNumberPagination):
+	page_size = 10
+	page_size_query_param = 'page_size'
+	max_page_size = 100
 
 
 # The CachedAPIViewMixin class provides a method for caching API responses using Redis.
@@ -96,6 +101,8 @@ class OrderList(generics.GenericAPIView, mixins.ListModelMixin, mixins.CreateMod
 class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView, CachedAPIViewMixin):
 	serializer_class = OrderSerializer
 	lookup_field = 'order_number'
+	pagination_class = CustomPagination
+
 	def get_queryset(self):
 		return Order.objects.all()
 	
@@ -118,6 +125,8 @@ class OrderDetailAPIView(generics.RetrieveUpdateDestroyAPIView, CachedAPIViewMix
 class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
 	serializer_class = ProductSerializer
 	lookup_field = 'product_id'
+	pagination_class = CustomPagination
+
 	def get_queryset(self):
 		return Product.objects.all()
 	
@@ -143,6 +152,8 @@ class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
 class RelationshipAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Link.objects.all()
 	serializer_class = RelationshipSerializer
+	pafgination_class = CustomPagination
+
 	@log_db_queries
 	def list(self, request):
 		pk = self.request.query_params.get('pk')
@@ -163,6 +174,7 @@ class RelationshipAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 class DeliveryAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Delivery.objects.all()
 	serializer_class = DeliverySerializer
+	pagination_class = CustomPagination
 
 	@log_db_queries
 	def list(self, request):
@@ -182,6 +194,8 @@ class DeliveryAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 class OrderListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	serializer_class = OrderSerializer
 	lookup_field = "pk"
+	pagination_class = CustomPagination
+
 	def get_queryset(self):
 		return Order.objects.all()
 
@@ -206,6 +220,7 @@ class OrderListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 class ProductListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Product.objects.all()
 	serializer_class = ProductSerializer
+	pagination_class = CustomPagination
 
 	@log_db_queries
 	def list(self, request):
@@ -229,6 +244,7 @@ class IssueListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Issue.objects.all()
 	lookup_field = "pk"
 	serializer_class = IssueSerializer
+	pagination_class = CustomPagination
 
 	@log_db_queries
 	def list(self, request):
@@ -249,6 +265,7 @@ class IssueListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 class VendorListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Vendor.objects.all()
 	serializer_class = VendorSerializer
+	pagination_class = CustomPagination
 
 	@log_db_queries
 	def list(self, request):
@@ -268,6 +285,7 @@ class VendorListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 class RetailListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Retail.objects.all()
 	serializer_class = RetailSerializer
+	pagination_class = CustomPagination
 
 	@log_db_queries
 	def list(self, request):
@@ -288,6 +306,7 @@ class RetailListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 class CustomerListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Customer.objects.all()
 	serializer_class = CustomerSerializer
+	pagination_class = CustomPagination
 
 	@log_db_queries
 	def list(self, request):
