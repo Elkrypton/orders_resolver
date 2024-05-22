@@ -81,6 +81,13 @@ class Link(models.Model):
 	relation_B = models.ForeignKey('Vendor', on_delete=models.CASCADE)
 	customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
 	
+
+
+	class Meta:
+		indexes =[
+			models.Index(fields=['link_id'])
+		]
+		
 	def generate_transaction_id(self):
 		prefix="RE"
 		random_part = str(uuid.uuid4().int)[:8]
@@ -101,7 +108,6 @@ class Link(models.Model):
 # and includes methods for generating a unique product ID and handling warranty status.
 class Product(models.Model):
 
-
 	product_id = models.CharField(max_length=255, unique=True, primary_key=True, editable=False)
 	product = models.CharField(max_length=100)
 	model_n = models.CharField(max_length=100, blank=True, null=True)
@@ -114,6 +120,11 @@ class Product(models.Model):
 	active_warranty = models.BooleanField(default=True)
 	owned_before = models.BooleanField(default=False)
 	
+	class Meta:
+		indexes =[
+			models.Index(fields=['product_id'])
+		]
+
 
 	def generate_product_id(self):
 		prefix = "PROD"
@@ -141,7 +152,10 @@ class Issue(models.Model):
 	order_issued = models.ForeignKey('Order', on_delete=models.CASCADE)
 	link = models.ForeignKey('Link', on_delete=models.CASCADE, null=True)
 	
-
+	class Meta:
+		indexes =[
+			models.Index(fields=['issue_id'])
+		]
 	def generate_issue_id(self):
 		prefix = "ISS"
 		random_part = str(uuid.uuid4().int)[:6]
@@ -174,6 +188,12 @@ class Retail(models.Model):
 	purchased_from = models.BooleanField(default=False)
 	products_purchased = models.ForeignKey('Product', on_delete=models.CASCADE, null=True)
 
+
+	class Meta:
+		indexes =[
+			models.Index(fields=['retail_id'])
+		]
+
 	def generate_retail_id(self):
 		prefix = "RET"
 		random_part = str(uuid.uuid4().int)[:5]
@@ -200,6 +220,12 @@ class Vendor(models.Model):
 	accept_return = models.BooleanField(default=False)
 	return_window = models.IntegerField(default=720, editable=False)
 	related_retails = models.ForeignKey('Retail', on_delete=models.CASCADE, null=True)
+
+
+	class Meta:
+		indexes =[
+			models.Index(fields=['vendor_id'])
+		]
 
 	def generate_vendor_id(self):
 		prefix = "VEND"
@@ -253,6 +279,11 @@ class Delivery(models.Model):
 		issue: Foreign Key for related issue instances
 	"""
 
+	class Meta:
+		indexes =[
+			models.Index(fields=['delivery_status'])
+		]
+
 	delivery_id = models.CharField(max_length=255, primary_key=True, unique=True)
 	related_order = models.ForeignKey('Order', on_delete=models.CASCADE, null=True)
 	delivery_status = models.CharField(max_length=233, choices=DELIVERY_STATUS)
@@ -291,6 +322,10 @@ class Order(models.Model):
 	date_delivered = models.DateTimeField((""), auto_now=False, auto_now_add=False)
 	ordered = models.BooleanField(default=False)
 	
+	class Meta:
+		indexes =[
+			models.Index(fields=['order_number'])
+		]
 
 	def generate_order_number(self):
 		prefix = "IR"
