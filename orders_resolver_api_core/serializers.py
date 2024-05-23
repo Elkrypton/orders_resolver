@@ -21,7 +21,6 @@ class RelationshipSerializer(serializers.ModelSerializer):
 		model = Link
 		fields = "__all__"
 	
-
 class ProductSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Product
@@ -46,11 +45,6 @@ class RetailSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Retail
 		fields = "__all__"
-
-# class DamageSerializer(serializers.ModelSerializer):
-# 	class Meta:
-# 		model = Damage
-# 		fields = "__all__"
 
 class DeliverySerializer(serializers.ModelSerializer):
 	class Meta:

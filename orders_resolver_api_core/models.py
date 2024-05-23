@@ -6,63 +6,6 @@ import uuid
 from datetime import datetime
 from .constants import * 
 
-
-# product_materials = [
-# 	('PLASTIC','plastic'),
-# 	('METAL','material'),
-# 	('GLASS', 'glass'),
-# 	('HYBRID', 'Hybrid'),
-# ]
-
-# area_of_use = [
-# 	('HOUSE_01', 'Living Room'),
-# 	('HOUSE_02', 'Kitchen'),
-# 	('HOUSE_03', 'Bedroom'),
-# 	('HOUSE_04', 'Bathroom'),
-# ]
-
-# product_categories = [('HOME DECOR', 'Home Decor'),
-# 		      ('APPLIANCES', 'Appliances'),
-# 			  ('ELECTRONICS', 'Electronics'),
-# 			  ('ACCESSORIES', 'Accessories'),]
-
-
-# DAMAGE_SOURCE = [
-# 	('1001', 'customer damage'),
-# 	('1002', 'vendor damage'),
-# 	('1003',  'retail damage'),
-# 	('0000',  None),
-# ]
-
-# ISSUE_TYPES = [
-#  ('DEFECTIVE', 'defective unit'),
-#  ('WRONG UNIT', 'wrong unit'),
-#  ('OTHER', 'other reason'),
-
-# ]
-
-# DELIVERY_STATUS = [
-# 	('Preparing for shippment', '0001'),
-# 	('SHIPPED', '0002'),
-# 	('OUT FOR DELIVERY', '0003'),
-# 	('DELIVERED', '0004'),
-# ]
-
-# ISSUE_STATUS = [
-# 	('0001', 'failed'),
-# 	('0000', 'processing'),
-# 	('0002', 'passed'),
-# ]
-
-# PAYMENT_METHODS = [('card','credit/debit'),
-# 		   			('cash', 'cash'),
-# 	 				('paypal', 'paypal')]
-
-# PURCHASE_LOCATION = [('store', 'store'),
-# 		      	('online', 'online'),
-# 				('VENDOR','Vendor Direct')]
-
-
 # This Python class defines a Link model representing transactions between a Retail entity, a Vendor
 # entity, and a Customer entity, with a method to generate a unique transaction ID.
 class Link(models.Model):
@@ -80,8 +23,6 @@ class Link(models.Model):
 	relation_A = models.ForeignKey('Retail', on_delete=models.CASCADE)
 	relation_B = models.ForeignKey('Vendor', on_delete=models.CASCADE)
 	customer = models.ForeignKey('Customer', on_delete=models.CASCADE)
-	
-
 
 	class Meta:
 		indexes =[
@@ -125,7 +66,6 @@ class Product(models.Model):
 			models.Index(fields=['product_id'])
 		]
 
-
 	def generate_product_id(self):
 		prefix = "PROD"
 		random_part = str(uuid.uuid4().int)[:5]
@@ -144,6 +84,7 @@ class Product(models.Model):
 
 	def __str__(self):
 		return f"Product : {self.product} - Returnable : {self.returnable}"
+	
 
 class Issue(models.Model):
 	issue_id = models.CharField(max_length=255, primary_key=True, editable=False, unique=True)
@@ -178,8 +119,6 @@ class Retail(models.Model):
 	Returns:
 		__str__() ->: Retail instance primary key: 
 	"""
-
-
 	retail_id = models.CharField(max_length=255, unique=True, editable=False, primary_key=True)
 	retail_name = models.CharField(max_length=100, unique='True')
 	accept_return = models.BooleanField(default=False)
@@ -242,6 +181,7 @@ class Vendor(models.Model):
 	def __str__(self):
 		return f"Vendor Name : {self.vendor_name} - {self.vendor_id}"
 	
+
 class Customer(models.Model):
 	customer_id = models.CharField(max_length=255, editable=False, unique=True, primary_key=True)
 	customer_name = models.CharField(max_length=100)
@@ -357,4 +297,3 @@ class Order(models.Model):
 	def __str__(self):
 		return f"Order Number : {self.order_number}-'\
 				{self.retail}-{self.vendor}"
-

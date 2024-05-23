@@ -21,7 +21,6 @@ class CustomPagination(PageNumberPagination):
 	page_size_query_param = 'page_size'
 	max_page_size = 100
 
-
 # The CachedAPIViewMixin class provides a method for caching API responses using Redis.
 class CachedAPIViewMixin:
 	cache_timeout = 40*40
@@ -68,9 +67,6 @@ def log_db_queries(f):
 		print("-" *80)
 		return res
 	return new_f
-
-
-
 
 
 # This class is an API view in Django REST framework for listing and creating Order objects, with
@@ -145,7 +141,6 @@ class ProductDetails(generics.RetrieveUpdateDestroyAPIView):
 		
 		return self.cached_response(cache_key, queryset, self.serializer_class)
 
-			 
 
 # The `RelationshipAPIView` class is a Django REST framework view that lists and creates instances of
 # the `Link` model, with caching and logging of database queries implemented.
@@ -167,10 +162,7 @@ class RelationshipAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	
 		return self.cached_response(cache_key, queryset, self.serializer_class)
 
-# class DamageAPIView(generics.ListCreateAPIView):
-# 	queryset = Damage.objects.all()
-# 	serializer_class = DamageSerializer
-	
+
 class DeliveryAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Delivery.objects.all()
 	serializer_class = DeliverySerializer
@@ -215,7 +207,6 @@ class OrderListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 		return self.cached_response(cache_key, queryset, self.serializer_class)
 
 		
-	
 # This class is a ListCreateAPIView for products with caching and logging of database queries.
 class ProductListCreateAPIView(generics.ListCreateAPIView, CachedAPIViewMixin):
 	queryset = Product.objects.all()
@@ -408,10 +399,3 @@ class InitiateReturnCase:
 		else:
 			self.issue_state = False
 			return f"Failed :Return of the unit failed either to the warehouse "
-		
-		
-
-
-    
-
-
