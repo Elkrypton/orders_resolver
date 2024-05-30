@@ -92,6 +92,8 @@ class Issue(models.Model):
 	issue_status = models.CharField(choices=ISSUE_STATUS, max_length=100)
 	order_issued = models.ForeignKey('Order', on_delete=models.CASCADE)
 	link = models.ForeignKey('Link', on_delete=models.CASCADE, null=True)
+	number_of_passed_issues = models.IntegerField()
+	number_of_failed_issues = models.IntegerField()
 	
 	class Meta:
 		indexes =[
@@ -106,6 +108,12 @@ class Issue(models.Model):
 	def save(self, *args, **kwargs):
 		if not self.issue_id:
 			self.issue_id = self.generate_issue_id()
+		
+		if self.issue_status == "Passed" or self.issue_status == "Resolved":
+			self.number_of_passed_issues += 1
+		elif self.issue_status != "Passed" and self.issue_status != "Resolved":
+			self.number_of_failed_issues += 1
+		
 		super(Issue, self).save(*args, **kwargs)
 
 	def __str__(self):

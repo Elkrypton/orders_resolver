@@ -112,7 +112,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'orders_resolver_api.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
